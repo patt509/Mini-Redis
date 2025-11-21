@@ -33,7 +33,7 @@ HashTable* ht_create(int size);
    Accepts only the string value.
    - the specific hash function needs to be defined -
 */
-ulong hash(char* value);
+unsigned long hash(char* value);
 
 /*
    Helper for the insert function.
