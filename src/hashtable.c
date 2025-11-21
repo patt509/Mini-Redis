@@ -58,7 +58,7 @@ Node* ht_create_pair (char* value, char* key) {
    }
    node->value = newValue;
    node->key = newKey;
-
+   node->next = NULL;
    return node;
 }
 
