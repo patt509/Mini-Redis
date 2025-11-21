@@ -29,7 +29,7 @@ HashTable* ht_create (int size) {
    return table;
 }
 
-unsigned long hash (char* value) {
+unsigned long hash (char* value, int size) {
    // Coming soon...
 }
 
@@ -65,7 +65,7 @@ Node* ht_create_pair (char* value, char* key) {
 bool ht_insert (HashTable* table, char* key, char* value) {
    // Get the corresponding index from the 
    // calling the hash function
-   unsigned int index = hash(key);
+   unsigned int index = hash(key, table->size);
 
    Node* tmp = table->buckets[index];
    while (tmp != NULL) {
