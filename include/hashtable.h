@@ -5,9 +5,8 @@
 typedef struct Node {
    char* key;
    char* value;
-
-   // Pointer to the next node of the collision bucket
-   struct Node *next;
+   uint64_t rawHash;    // Storing row hash in case of future changes to the table
+   struct Node *next;   // Pointer to the next node of the collision bucket
 } Node;
 
 // Hash table struct
@@ -25,7 +24,7 @@ typedef struct HashTable {
    non initialized pointers can point to random
    data and this would mess up the program.
 */
-HashTable* ht_create(int size);
+HashTable* ht_create (int size);
 
 /*
    Hash function that produces the corresponding index.
@@ -33,7 +32,7 @@ HashTable* ht_create(int size);
    Accepts only the string value.
    - the specific hash function needs to be defined -
 */
-unsigned long hash(char* value);
+unsigned long hash (char* value);
 
 /*
    Helper for the insert function.
@@ -45,7 +44,7 @@ unsigned long hash(char* value);
    Sets the next pointer of the node to NULL and return
    the pointer to the just created node.
 */
-Node* ht_create_pair(char* value, char* key);
+Node* ht_create_pair (char* value, char* key);
 
 /*
    Function that inserts a node into the table.
@@ -64,7 +63,7 @@ Node* ht_create_pair(char* value, char* key);
    first node and the bucket needs to point to the new node.
    Then increments the counter of total elements.
 */
-bool ht_insert(HashTable* table, char* key, char* value);
+bool ht_insert (HashTable* table, char* key, char* value);
 
 /*
    Function that returns a pointer to the value the
@@ -78,6 +77,6 @@ bool ht_insert(HashTable* table, char* key, char* value);
    If a match is found, the function will return char* value.
    If the whole bucket does not contain the key, return NULL.
 */
-char* ht_get(HashTable* table, char* key);
+char* ht_get (HashTable* table, char* key);
 
 #endif
