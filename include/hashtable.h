@@ -1,6 +1,9 @@
 #ifndef HASHTABLE_H
 #define HASHTABLE_H
 
+#include <stdint.h>
+#include <stdbool.h>
+
 // List node (for collisions)
 typedef struct Node {
    char* key;
