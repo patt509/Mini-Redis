@@ -29,13 +29,7 @@ typedef struct HashTable {
 */
 HashTable* ht_create (int size);
 
-/*
-   Hash function that produces the corresponding index.
-
-   Accepts only the string value.
-   - the specific hash function needs to be defined -
-*/
-unsigned long hash (char* value);
+/* Specific hash function signature and implementation hidden. */
 
 /*
    Helper for the insert function.
