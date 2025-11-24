@@ -19,21 +19,24 @@ void trim_newline (char* cmd) {
 }
 
 // Second function
-char** parse_cmd (char* cmd) {
+void parse_cmd (char* cmd, char* args[]) {
    // Using strtok to split the string into 3
    // (or 2 in case of a "GET" command) tokens
-   char** args;
+   
    // Get the specific command
    args[0] = strtok(cmd, " ");
    // Get the key
    args[1] = strtok(NULL, " ");
    // Get the value
    args[2] = strtok(NULL, " ");
-
-   return args;
 }
 
-void execute_cmd (HashTable* table, char** args) {
+// Returns bool false in case of EXIT command
+bool execute_cmd (HashTable* table, char** args) {
+   if (args == NULL || args[0] == NULL) {
+      return true; // Empty command, continue loop
+   }
+
    // DISPATCHER:
    if (strcmp(args[0], "SET") == 0) {
       // If the first arg is "SET", the dispatcher
@@ -41,34 +44,46 @@ void execute_cmd (HashTable* table, char** args) {
       if (args[1] != NULL && args[2] != NULL) {
          if (ht_insert(table, args[1], args[2])) {
             // If the insert operation returns true...
-            printf("\nDone! Data (key: %s, value: %s) was inserted succesfully.", args[1], args[2]);
+            printf("Done! Data (key: %s, value: %s) was inserted succesfully.\n", args[1], args[2]);
          } else {
             // Else return the error message
-            printf("\nERR 2: insertion failed!");
+            printf("ERR 2: insertion failed!\n");
          }
+      } else {
+         printf("ERR: SET requires key and value\n");
       }
-   } else if (strcmp(args[0], "GET")) {
+
+      return true;
+   } else if (strcmp(args[0], "GET") == 0) {
       // If the first arg is "GET", the dispatcher
       // has to execute the ht_get function
-      char* searched_value = ht_get(table, args[1]);
-      // Check if the key exists
       if (args[1] != NULL) {
+         char* searched_value = ht_get(table, args[1]);
          if (searched_value) {
             // If the get operation returns something...
-            printf("\nDone! The value corresponding to this key %s is: %s", args[1], searched_value);
+            printf("Done! The value corresponding to this key %s is: %s\n", args[1], searched_value);
          } else {
             // Otherwise return the message
-            printf("\nThe key was not found.");
+            printf("The key was not found.\n");
          }
+      } else {
+         printf("ERR: GET requires a key\n");
       }
-   } else if (strcmp(args[0], "DEL")) {
-      // TODO: DEL command not yet supported      
-   } else if (strcmp(args[0], "EXIT")) {
+
+      return true;
+   } else if (strcmp(args[0], "DEL") == 0) {
+      // TODO: DEL command not yet supported
+      printf("DEL command not yet supported\n");
+      return true;      
+   } else if (strcmp(args[0], "EXIT") == 0) {
       // If the first arg is "EXIT", close and exit the program
-      printf("\nThanks for using mini-redis!");
-      return;
+      printf("Thanks for using mini-redis!\n");
+
+      return false;
    } else {
-      printf("\nERR 1: command is not valid, '%s'", args[0]);
+      printf("ERR 1: command is not valid, '%s'\n", args[0]);
+
+      return true;
    }
 }
 
@@ -76,23 +91,33 @@ void execute_cmd (HashTable* table, char** args) {
 void server_run (HashTable* table) {
    // Static buffer on the stack
    char buffer[MAX_CMD_SIZE];
+   char* args[3]; // Array of pointers on the stack
 
    while (1) {
       printf("mini-redis> ");
 
       // User insterts the command
       // Reading the string from standard input stream
-      fgets(buffer, MAX_CMD_SIZE, stdin);
-      if (!buffer) {
-         printf("\nERR 0: error during memory allocation.");
-         EXIT(0);
+      if (fgets(buffer, MAX_CMD_SIZE, stdin) == NULL) {
+         break; // Handle EOF (Ctrl+D)
       }
 
       // Trimming '\n' character
       trim_newline(buffer);
       // Parsing the command in tokens
-      char** args = parse_cmd(buffer);
-      // Dispatcher that executes the correct function
-      execute_cmd(args);
+      parse_cmd(buffer, args);
+
+      /*
+         Dispatcher that execute the correct function and
+         returns a boolean value:
+         - if it returns true, the loop continues
+         - if it returns false, it means the use run the EXIT command
+           so the cycle needs to stop
+      */
+      bool continue_loop = execute_cmd(table, args);
+      
+      if (!continue_loop) {
+         break;
+      }
    }
 }

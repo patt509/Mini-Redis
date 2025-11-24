@@ -13,11 +13,14 @@ BUILD_DIR = build
 # Source Files
 # Find all .c files in src/
 SRCS = $(wildcard $(SRC_DIR)/*.c)
+# Main file
+MAIN_SRC = main.c
 # Find all .c files in tests/
 TEST_SRCS = $(wildcard $(TEST_DIR)/*.c)
 
 # Object files
 OBJS = $(SRCS:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
+MAIN_OBJ = $(BUILD_DIR)/main.o
 TEST_OBJS = $(TEST_SRCS:$(TEST_DIR)/%.c=$(BUILD_DIR)/%.o)
 
 # Exclude server.o (main) from test build to avoid multiple definition
@@ -36,9 +39,9 @@ TEST_TARGET = $(BUILD_DIR)/run_tests
 # Default target: build the main program
 all: $(TARGET)
 
-# Build the main executable (commented out until i implement main.c (in src))
-# $(TARGET): $(OBJS)
-#		$(CC) $(OBJS) -o $@
+# Build the main executable
+$(TARGET): $(OBJS) $(MAIN_OBJ)
+	$(CC) $(OBJS) $(MAIN_OBJ) -o $@
 
 # Build the test executable
 # Links test objects + src objects (excluding main)
@@ -51,6 +54,13 @@ $(TEST_TARGET): $(OBJS_NO_MAIN) $(TEST_OBJS)
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
+
+# Compile main file
+$(BUILD_DIR)/main.o: $(MAIN_SRC)
+	@mkdir -p $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Compile test files
 
 # Compile test files
 $(BUILD_DIR)/%.o: $(TEST_DIR)/%.c
