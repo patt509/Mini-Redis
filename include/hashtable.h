@@ -76,4 +76,20 @@ bool ht_insert (HashTable* table, char* key, char* value);
 */
 char* ht_get (HashTable* table, char* key);
 
+/*
+   Function that delete the node with a specific
+   key (if it exists).
+
+
+*/
+bool ht_delete (HashTable* table, char* key);
+
+/*
+   Function that destroys and deallocate the entire table.
+
+
+*/
+void ht_destroy (HashTable* table);
+
+
 #endif

@@ -139,3 +139,69 @@ char* ht_get (HashTable* table, char* key) {
    // If not found return NULL
    return NULL;
 }
+
+bool ht_delete (HashTable* table, char* key) {
+   if (!table) {
+      return false;
+   }
+
+   unsigned int index = hash(key) & (table->size - 1);
+   Node* tmp = table->buckets[index];
+
+   // In case the first node of the bucket
+   // stores the value the function is searching for
+   if (tmp->key == key) {
+      table->buckets[index] = tmp->next;
+
+      tmp->key = NULL;
+      tmp->value = NULL;
+      tmp->next = NULL;
+      free(tmp);
+
+      return true;
+   }
+
+   // In case the searched value is not stored
+   // in the first node of the bucket
+   Node* next = tmp->next;
+   while (next) {
+      if (next->key == key) {
+         tmp->next = next->next;
+
+         next->key = NULL;
+         next->value = NULL;
+         next->next = NULL;
+         free(next);
+
+         return true;
+      }
+
+      tmp = next;
+      next = next->next;
+   }
+
+   return false;
+}
+
+void ht_destroy (HashTable* table) {
+   if (!table) {
+      return;
+   }
+
+   for (int i = 0; i < table->size; i++) {
+      Node* tmp = table->buckets[i];
+      Node* prev = NULL;
+
+      while (tmp != NULL) {
+         // Set every pointer to NULL and
+         // deallocate the node
+         tmp->key = NULL;
+         tmp->value = NULL;
+         prev = tmp;
+
+         tmp = tmp->next;
+         prev->next = NULL;
+         free(prev);
+      }
+   }
+}
