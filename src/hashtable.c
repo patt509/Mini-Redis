@@ -141,7 +141,7 @@ char* ht_get (HashTable* table, char* key) {
 }
 
 bool ht_delete (HashTable* table, char* key) {
-   if (!table) {
+   if (table == NULL || key == NULL) {
       return false;
    }
 
@@ -150,7 +150,7 @@ bool ht_delete (HashTable* table, char* key) {
 
    // In case the first node of the bucket
    // stores the value the function is searching for
-   if (tmp->key == key) {
+   if (strcmp(tmp->key, key) == 0) {
       table->buckets[index] = tmp->next;
 
       tmp->key = NULL;
@@ -165,7 +165,7 @@ bool ht_delete (HashTable* table, char* key) {
    // in the first node of the bucket
    Node* next = tmp->next;
    while (next) {
-      if (next->key == key) {
+      if (strcmp(next->key, key) == 0) {
          tmp->next = next->next;
 
          next->key = NULL;
