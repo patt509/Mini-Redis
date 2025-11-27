@@ -204,4 +204,7 @@ void ht_destroy (HashTable* table) {
          free(prev);
       }
    }
+
+   free(table->buckets);
+   free(table);
 }
