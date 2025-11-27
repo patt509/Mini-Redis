@@ -9,7 +9,29 @@
 #define FNV_OFFSET_BASIS 14695981039346656037UL
 #define FNV_PRIME 1099511628211UL
 
+/* 
+   Private helper function that transform the value
+   inserted by the user in a power of 2 to make
+   bit-wise logic work.
+*/
+static int next_power_of_2 (int n) {
+   // If the dim is 0 or negative
+   if (n < 1) {
+      return 1;
+   }
+
+   int power = 1;
+   while (power < n) {
+      // Bit-wise shift operation that
+      // multiplies by two, extremely efficient
+      power <<= 1;
+   }
+
+   return power;
+}
+
 HashTable* ht_create (int size) {
+   size = next_power_of_2(size);
    // Allocate space for the table
    HashTable* table = malloc(sizeof(HashTable));
    // Checks error during the allocation
