@@ -172,6 +172,7 @@ bool ht_delete (HashTable* table, char* key) {
          next->value = NULL;
          next->next = NULL;
          free(next);
+         table->count--;
 
          return true;
       }
