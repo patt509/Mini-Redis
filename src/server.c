@@ -11,6 +11,27 @@
 #define YELLOW      "\033[33m"
 #define RESET       "\033[0m"
 
+/* 
+   Private helper function that transform the value
+   inserted by the user in a power of 2 to make
+   bit-wise logic work.
+*/
+int next_power_of_2 (int n) {
+   // If the dim is 0 or negative
+   if (n < 1) {
+      return 1;
+   }
+
+   int power = 1;
+   while (power < n) {
+      // Bit-wise shift operation that
+      // multiplies by two, extremely efficient
+      power <<= 1;
+   }
+
+   return power;
+}
+
 // First function
 void trim_newline (char* cmd) {
    // Get the lenght of the command inserted
@@ -131,6 +152,8 @@ void server_run (HashTable* table) {
    // Static buffer on the stack
    char buffer[MAX_CMD_SIZE];
    char* args[3]; // Array of pointers on the stack
+
+   
 
    while (1) {
       printf("mini-redis> ");

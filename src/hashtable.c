@@ -9,34 +9,7 @@
 #define FNV_OFFSET_BASIS 14695981039346656037UL
 #define FNV_PRIME 1099511628211UL
 
-/* 
-   Private helper function that transform the value
-   inserted by the user in a power of 2 to make
-   bit-wise logic work.
-*/
-static int next_power_of_2 (int n) {
-   // If the dim is 0 or negative
-   if (n < 1) {
-      return 1;
-   }
-
-   int power = 1;
-   while (power < n) {
-      // Bit-wise shift operation that
-      // multiplies by two, extremely efficient
-      power <<= 1;
-   }
-
-   return power;
-}
-
-HashTable* ht_create () {
-   int size;
-   printf("Insert the table size: ");
-   scanf("%d", &size);
-   size = next_power_of_2(size);
-   printf("\nSize aproximated to the nearest power of 2: %d.\n", size);
-
+HashTable* ht_create (int size) {
    // Allocate space for the table
    HashTable* table = malloc(sizeof(HashTable));
    // Checks error during the allocation
@@ -83,7 +56,7 @@ uint64_t hash (char* key) {
    return hash;
 }
 
-Node* ht_create_pair (char* key, char* value) {
+Node* ht_create_pair (char* key, char* value, uint64_t hash) {
    // Value or key not valid
    if (!value || !key) {
       return NULL;
@@ -108,7 +81,7 @@ Node* ht_create_pair (char* key, char* value) {
    }
    node->value = newValue;
    node->key = newKey;
-   node->rawHash = hash(key);
+   node->rawHash = hash;
    node->next = NULL;
    return node;
 }
@@ -118,7 +91,8 @@ bool ht_insert (HashTable* table, char* key, char* value) {
    // to the size of the table
 
    // WARNING: this AND normalization only works if table size is a power of 2!
-   unsigned int index = hash(key) & (table->size - 1);   // Get the index using AND bit-wise operation
+   uint64_t h = hash(key);
+   unsigned int index = h & (table->size - 1);   // Get the index using AND bit-wise operation
    Node* tmp = table->buckets[index];
 
    while (tmp != NULL) {
@@ -140,7 +114,7 @@ bool ht_insert (HashTable* table, char* key, char* value) {
 
    // Case 2: If a node with the same key is NOT found
    // the node is inserted at the head of the bucket
-   Node* newNode = ht_create_pair(key, value);
+   Node* newNode = ht_create_pair(key, value, h);
    if (!newNode) {
       return false;
    }
@@ -187,9 +161,6 @@ bool ht_delete (HashTable* table, char* key) {
 
       free(tmp->key);
       free(tmp->value);      
-      tmp->key = NULL;
-      tmp->value = NULL;
-      tmp->next = NULL;
       free(tmp);
 
       return true;
@@ -204,9 +175,6 @@ bool ht_delete (HashTable* table, char* key) {
 
          free(next->key);
          free(next->value);
-         next->key = NULL;
-         next->value = NULL;
-         next->next = NULL;
          free(next);
          table->count--;
 
@@ -234,12 +202,9 @@ void ht_destroy (HashTable* table) {
          // deallocate the node
          free(tmp->key);
          free(tmp->value);
-         tmp->key = NULL;
-         tmp->value = NULL;
          prev = tmp;
 
          tmp = tmp->next;
-         prev->next = NULL;
          free(prev);
       }
    }

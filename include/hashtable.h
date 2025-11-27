@@ -26,7 +26,7 @@ typedef struct HashTable {
    to NULL because non initialized pointers can point to random
    data and mess up the program.
 */
-HashTable* ht_create ();
+HashTable* ht_create (int size);
 
 /*
    Helper for the insert function.
@@ -38,7 +38,7 @@ HashTable* ht_create ();
    Sets the next pointer of the node to NULL and return
    the pointer to the just created node.
 */
-Node* ht_create_pair (char* value, char* key);
+Node* ht_create_pair (char* key, char* value, uint64_t hash);
 
 /*
    Function that inserts a node into the table.
