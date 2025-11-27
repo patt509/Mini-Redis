@@ -54,7 +54,7 @@ bool execute_cmd (HashTable* table, char** args) {
 
       if (ht_insert(table, args[1], args[2])) {
          // If the insert operation returns true...
-         printf("Data (key: %s%s%s, value: %s%s%s) was inserted succesfully!\n", GREEN, args[1], RESET, GREEN, args[2], RESET);
+         printf("Data (key: %s%s%s, value: %s%s%s) inserted succesfully!\n", GREEN, args[1], RESET, GREEN, args[2], RESET);
       } else {
          // Else return the error message
          printf("%sERR 3%s: insertion failed!\n", RED, RESET);
@@ -87,6 +87,11 @@ bool execute_cmd (HashTable* table, char** args) {
    } else if (strcmp(args[0], "DEL") == 0) {
       if (args[2] != NULL) {
          printf("%sERR 4%s: too many arguments, DEL command only accepts one parameter, the key.\n", RED, RESET);
+         return true;
+      }
+
+      if (args[1] == NULL) {
+         printf("%sERR 5%s: DEL needs one argument, the key.\n", RED, RESET);
          return true;
       }
 

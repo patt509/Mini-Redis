@@ -9,7 +9,34 @@
 #define FNV_OFFSET_BASIS 14695981039346656037UL
 #define FNV_PRIME 1099511628211UL
 
-HashTable* ht_create (int size) {
+/* 
+   Private helper function that transform the value
+   inserted by the user in a power of 2 to make
+   bit-wise logic work.
+*/
+static int next_power_of_2 (int n) {
+   // If the dim is 0 or negative
+   if (n < 1) {
+      return 1;
+   }
+
+   int power = 1;
+   while (power < n) {
+      // Bit-wise shift operation that
+      // multiplies by two, extremely efficient
+      power <<= 1;
+   }
+
+   return power;
+}
+
+HashTable* ht_create () {
+   int size;
+   printf("Insert the table size: ");
+   scanf("%d", &size);
+   size = next_power_of_2(size);
+   printf("\nSize aproximated to the nearest power of 2: %d.\n", size);
+
    // Allocate space for the table
    HashTable* table = malloc(sizeof(HashTable));
    // Checks error during the allocation
@@ -147,6 +174,11 @@ bool ht_delete (HashTable* table, char* key) {
 
    unsigned int index = hash(key) & (table->size - 1);
    Node* tmp = table->buckets[index];
+
+   // If the bucket is empty, the key is definitely not here
+   if (tmp == NULL) {
+      return false;
+   }
 
    // In case the first node of the bucket
    // stores the value the function is searching for

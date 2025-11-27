@@ -22,14 +22,11 @@ typedef struct HashTable {
 /*
    Function that creates the table.
 
-   It accepts the initial size of the table, allocates
-   the buckets. It sets every bucket to NULL because
-   non initialized pointers can point to random
-   data and this would mess up the program.
+   It allocates the buckets and sets each of them
+   to NULL because non initialized pointers can point to random
+   data and mess up the program.
 */
-HashTable* ht_create (int size);
-
-/* Specific hash function signature and implementation hidden. */
+HashTable* ht_create ();
 
 /*
    Helper for the insert function.
