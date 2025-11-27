@@ -185,6 +185,8 @@ bool ht_delete (HashTable* table, char* key) {
    if (strcmp(tmp->key, key) == 0) {
       table->buckets[index] = tmp->next;
 
+      free(tmp->key);
+      free(tmp->value);      
       tmp->key = NULL;
       tmp->value = NULL;
       tmp->next = NULL;
@@ -200,6 +202,8 @@ bool ht_delete (HashTable* table, char* key) {
       if (strcmp(next->key, key) == 0) {
          tmp->next = next->next;
 
+         free(next->key);
+         free(next->value);
          next->key = NULL;
          next->value = NULL;
          next->next = NULL;
@@ -228,6 +232,8 @@ void ht_destroy (HashTable* table) {
       while (tmp != NULL) {
          // Set every pointer to NULL and
          // deallocate the node
+         free(tmp->key);
+         free(tmp->value);
          tmp->key = NULL;
          tmp->value = NULL;
          prev = tmp;
