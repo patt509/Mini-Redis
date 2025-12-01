@@ -76,17 +76,24 @@ char* ht_get (HashTable* table, char* key);
 /*
    Function that delete the node with a specific
    key (if it exists).
-
-
 */
 bool ht_delete (HashTable* table, char* key);
 
 /*
    Function that destroys and deallocate the entire table.
-
-
 */
 void ht_destroy (HashTable* table);
 
+/*
+   Saves the entire hash table to a binary file.
+   Format: [Table Size] -> [Key Len][Key][Val Len][Val] -> ...
+*/
+void ht_save (HashTable* table, const char* filename);
+
+/*
+   Loads a hash table from a binary file.
+   Returns NULL if file doesn't exist.
+*/
+HashTable* ht_load (const char* filename);
 
 #endif

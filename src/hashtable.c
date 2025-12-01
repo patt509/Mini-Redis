@@ -234,3 +234,49 @@ void ht_destroy (HashTable* table) {
    free(table->buckets);
    free(table);
 }
+
+/*
+   1. The function opens the file in "wb" mode.
+   2. Writes the size field of the table as the first
+      sequence of bytes.
+   3. Double cycle:
+      - External cycle, iterates through the array
+      of buckets
+      - For every bucket, iterates through the nodes
+      while node is not NULL
+   4. For every node: for every key string, count
+      the bytes ('\0' character included, it is easier
+      to store it in the binary file) and the key
+      itseld, and does the same for the value.
+   5. Closes the file stream.
+*/
+void ht_save (HashTable* table, const char* filename) {
+   // ...
+}
+
+/*
+   This function reads the file and creates a full
+   hash table with the data inside.
+
+   1. Check the existence of the file.
+   2. Read the first integer, the size of the table.
+   3. Call ht_create with the size just read.
+   4. Loop that continues until EOF:
+      - Tries to read an integer (size of key), and
+      if it is found, allocates that amount of space
+      and reads the key data next. Repeat the same
+      steps for the value size and data.
+      - Calls ht_insert passing the table, the key
+      buffer and the value buffer. ht_insert
+      allocates memory for the buffer so the function
+      frees the memory for the just allocated buffers.
+   5. Closes the file stream and return a pointer
+      to the just created table.
+
+   TODO: replace ht_insert function call with a
+   personalized logic that prevents a second and
+   useless allocation of the key and value buffers.
+*/
+HashTable* ht_load(const char* filename) {
+   // ...
+}
