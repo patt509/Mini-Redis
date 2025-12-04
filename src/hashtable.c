@@ -271,16 +271,16 @@ bool ht_save (HashTable* table, const char* filename) {
          // Save key size (with '\0'), key,
          // value size (with '\0') and value
          int tmp_size;
-         tmp_size = strlen(table->buckets[i]->key) + 1; // '\0' character
+         tmp_size = strlen(tmp->key) + 1; // '\0' character
          // Write the size of the key
          fwrite(&tmp_size, sizeof(int), 1, fp);
          // Write the key itself
-         fwrite(table->buckets[i]->key, tmp_size, 1, fp); // '\0' character
+         fwrite(tmp->key, tmp_size, 1, fp); // '\0' character
          // Write the size of the value
-         tmp_size = strlen(table->buckets[i]->value) + 1;
+         tmp_size = strlen(tmp->value) + 1;
          fwrite(&tmp_size, sizeof(int), 1, fp);
          // Write the value itself
-         fwrite(table->buckets[i]->value, tmp_size, 1, fp);
+         fwrite(tmp->value, tmp_size, 1, fp);
 
          tmp = tmp->next;
       }
@@ -355,11 +355,18 @@ HashTable* ht_load(const char* filename) {
       fread(value, value_size, 1, fp);
 
       bool done = ht_insert(table, key, value);
+      
+      // Free the temporary buffers because ht_insert makes a copy
+      free(key);
+      free(value);
+
       if (!done) {
          ht_destroy(table);
+         fclose(fp);
          return NULL;
       }
    }
 
+   fclose(fp);
    return table;
 }
