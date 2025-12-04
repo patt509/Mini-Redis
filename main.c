@@ -14,12 +14,17 @@ int main() {
    // Consume newline left by scanf
    while (getchar() != '\n');
 
-   HashTable* table = ht_create(size_input);
-   if (!table) {
-      printf("Error during table allocation.");
-
-      return 1;
+   HashTable* table = ht_load("dump.bin");
+   if (table == NULL) {
+      printf("Error during table loading from file.\n");
    }
+
+   // HashTable* table = ht_create(size_input);
+   // if (!table) {
+   //    printf("Error during table allocation.");
+
+   //    return 1;
+   // }
 
    // Start the loop
    server_run(table);

@@ -250,8 +250,45 @@ void ht_destroy (HashTable* table) {
       itseld, and does the same for the value.
    5. Closes the file stream.
 */
-void ht_save (HashTable* table, const char* filename) {
-   // ...
+bool ht_save (HashTable* table, const char* filename) {
+   // Open the file in write binary mode
+   FILE* fp = fopen(filename, "wb");
+   if (!fp) {
+      // Return 1, it means an error occured
+      // trying to save the table
+      return false;
+   }
+
+   // The first byte needs to be the size of the table
+   fwrite(&table->size, sizeof(table->size), 1, fp);
+   
+   // Double cycle, iterate through the array of buckets,
+   // and for every bucket iterates through the nodes
+   for (int i = 0; i < table->size; i++) {
+      Node* tmp = table->buckets[i];
+
+      while (tmp != NULL) {
+         // Save key size (with '\0'), key,
+         // value size (with '\0') and value
+         int tmp_size;
+         tmp_size = strlen(table->buckets[i]->key) + 1; // '\0' character
+         // Write the size of the key
+         fwrite(&tmp_size, sizeof(int), 1, fp);
+         // Write the key itself
+         fwrite(table->buckets[i]->key, tmp_size, 1, fp); // '\0' character
+         // Write the size of the value
+         tmp_size = strlen(table->buckets[i]->value) + 1;
+         fwrite(&tmp_size, sizeof(int), 1, fp);
+         // Write the value itself
+         fwrite(table->buckets[i]->value, tmp_size, 1, fp);
+
+         tmp = tmp->next;
+      }
+   }
+
+   // Close the file stream
+   fclose(fp);
+   return true;
 }
 
 /*
@@ -278,5 +315,51 @@ void ht_save (HashTable* table, const char* filename) {
    useless allocation of the key and value buffers.
 */
 HashTable* ht_load(const char* filename) {
-   // ...
+   FILE* fp = fopen(filename, "rb");
+   if (!fp) {
+      return NULL;
+   }
+
+   // Get table size from the first 4 bytes (int size)
+   int table_size;
+   fread(&table_size, sizeof(int), 1, fp);
+   if (table_size <= 0) {
+      // Return NULL if table size is not valid
+      return NULL;
+   }
+
+   HashTable* table = ht_create(table_size);
+   if (table == NULL) {
+      return NULL;
+   }
+
+   int key_size;
+   int value_size;
+   char* key = NULL;
+   char* value = NULL;
+   // If the size of the the key is correclty read
+   // it means the node is valid and the function can
+   // read the key, the value size and the value
+   // without checking for errors
+   while (fread(&key_size, sizeof(int), 1, fp) == 1) {
+      // Allocate the exact amount of bytes for the key
+      key = malloc(key_size);
+      // Get the key from the file
+      fread(key, key_size, 1, fp);
+
+      // Get the size of the value
+      fread(&value_size, sizeof(int), 1, fp);
+      // Allocate the exact amount of bytes for the value
+      value = malloc(value_size);
+      // Get the value from the file
+      fread(value, value_size, 1, fp);
+
+      bool done = ht_insert(table, key, value);
+      if (!done) {
+         ht_destroy(table);
+         return NULL;
+      }
+   }
+
+   return table;
 }

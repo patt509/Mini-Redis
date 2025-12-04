@@ -4,6 +4,7 @@
 #include "../include/server.h"
 
 #define MAX_CMD_SIZE 1024
+#define FILENAME "dump.bin"
 
 // ANSI C codes to enhance terminal output
 #define RED       "\033[31m"
@@ -161,6 +162,9 @@ void server_run (HashTable* table) {
          break;
       }
    }
+
+   // Save the table in the file "dump.bin"
+   ht_save(table, FILENAME);
 
    // When server stops running
    ht_destroy(table);

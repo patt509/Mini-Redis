@@ -1,2 +1,6 @@
 # Compilation files
 /build
+mini-redis*
+
+# Database dump file
+dump.bin

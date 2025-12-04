@@ -88,7 +88,7 @@ void ht_destroy (HashTable* table);
    Saves the entire hash table to a binary file.
    Format: [Table Size] -> [Key Len][Key][Val Len][Val] -> ...
 */
-void ht_save (HashTable* table, const char* filename);
+bool ht_save (HashTable* table, const char* filename);
 
 /*
    Loads a hash table from a binary file.
