@@ -2,16 +2,41 @@
 #include <stdlib.h>
 #include "./include/hashtable.h"
 #include "./include/server.h"
+#include "./include/persistence.h"
 
-#define FILENAME "dump.bin"
+#define FILENAME "dump.aof"
 
 int main() {
-   HashTable* table = ht_load("dump.bin");
-   if (table == NULL) {
-      // Temporary error that needs to be replaced by more specific errors
-      printf("Error during table loading from file: file does not exist or...\n");
+   printf("=== Mini-Redis Server ===\n");
+   
+   // Ask for persistence
+   char persistence_choice;
+   bool use_persistence = false;
+   printf("Enable persistence? (y/n): ");
+   if (scanf(" %c", &persistence_choice) == 1 && (persistence_choice == 'y' || persistence_choice == 'Y')) {
+      use_persistence = true;
+   }
+   // Consume newline
+   while (getchar() != '\n');
 
-      // Creating a completely new table
+   HashTable* table = NULL;
+
+   if (use_persistence) {
+      // Try to load from AOF
+      table = aof_load(FILENAME);
+      if (table) {
+         printf("Database loaded from AOF file.\n");
+         // Re-open for appending
+         if (!aof_init(FILENAME)) {
+             printf("Warning: Could not open AOF file for writing.\n");
+         }
+      } else {
+         printf("No existing AOF file found or load failed.\n");
+      }
+   }
+
+   // If table is still NULL (no persistence or load failed), create new
+   if (table == NULL) {
       int size_input;
       printf("Enter new hash table size: ");
       if (scanf("%d", &size_input) != 1) {
@@ -29,14 +54,33 @@ int main() {
          printf("Error during table allocation.");
          return 1;
       }
+
+      // If persistence is enabled, we need to initialize the file
+      // and write the table size as header (if we decide to support size header)
+      if (use_persistence) {
+          // For now, our aof_load expects size at the beginning.
+          // So we must create the file and write the size.
+          FILE* fp = fopen(FILENAME, "wb");
+          if (fp) {
+              fwrite(&table->size, sizeof(int), 1, fp);
+              fclose(fp);
+              
+              // Now open in append mode
+              aof_init(FILENAME);
+              printf("Persistence enabled. AOF file initialized.\n");
+          } else {
+              printf("Error creating AOF file.\n");
+          }
+      }
    }
 
    // Start the loop
    server_run(table);
    
-   // Save the table in the file
-   ht_save(table, FILENAME);
-   // When server stops running
+   // Cleanup
+   if (use_persistence) {
+       aof_close();
+   }
    ht_destroy(table);
    return 0;
 }

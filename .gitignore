@@ -3,4 +3,4 @@
 mini-redis*
 
 # Database dump file
-dump.bin
+dump.aof

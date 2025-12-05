@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../include/server.h"
+#include "../include/persistence.h"
 
 #define MAX_CMD_SIZE 1024
 
@@ -55,6 +56,9 @@ bool execute_cmd (HashTable* table, char** args) {
       if (ht_insert(table, args[1], args[2])) {
          // If the insert operation returns true...
          printf("Data (key: %s%s%s, value: %s%s%s) inserted succesfully!\n", GREEN, args[1], RESET, GREEN, args[2], RESET);
+         
+         // Log to AOF
+         aof_log_set(args[1], args[2]);
       } else {
          // Else return the error message
          printf("%sERR 3%s: insertion failed!\n", RED, RESET);
@@ -98,6 +102,9 @@ bool execute_cmd (HashTable* table, char** args) {
       bool success = ht_delete(table, args[1]);
       if (success) {
          printf("The element was deleted successfully!\n");
+         
+         // Log to AOF
+         aof_log_del(args[1]);
       } else {
          /*
             Currently, this error can be seen for only two different reasons:

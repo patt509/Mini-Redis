@@ -31,7 +31,13 @@ static int next_power_of_2 (int n) {
 }
 
 HashTable* ht_create (int size) {
+   int original_size = size;
    size = next_power_of_2(size);
+
+   if (size != original_size) {
+      printf("Notice: Hash table size adjusted from %d to %d (must be power of 2)\n", original_size, size);
+   }
+
    // Allocate space for the table
    HashTable* table = malloc(sizeof(HashTable));
    // Checks error during the allocation
