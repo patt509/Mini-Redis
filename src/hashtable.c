@@ -61,7 +61,7 @@ HashTable* ht_create (int size) {
 }
 
 // Implementation of the FNV-1a for non-cryptographic ht
-uint64_t hash (char* key) {
+static uint64_t hash (char* key) {
    uint64_t hash = FNV_OFFSET_BASIS;
 
    // For every character of the char* value string
@@ -241,21 +241,6 @@ void ht_destroy (HashTable* table) {
    free(table);
 }
 
-/*
-   1. The function opens the file in "wb" mode.
-   2. Writes the size field of the table as the first
-      sequence of bytes.
-   3. Double cycle:
-      - External cycle, iterates through the array
-      of buckets
-      - For every bucket, iterates through the nodes
-      while node is not NULL
-   4. For every node: for every key string, count
-      the bytes ('\0' character included, it is easier
-      to store it in the binary file) and the key
-      itseld, and does the same for the value.
-   5. Closes the file stream.
-*/
 bool ht_save (HashTable* table, const char* filename) {
    // Open the file in write binary mode
    FILE* fp = fopen(filename, "wb");
@@ -297,29 +282,44 @@ bool ht_save (HashTable* table, const char* filename) {
    return true;
 }
 
-/*
-   This function reads the file and creates a full
-   hash table with the data inside.
+// Helper function for ht_load: takes ownership of key and value pointers
+bool ht_insert_own(HashTable* table, char* key, char* value) {
+   uint64_t h = hash(key);
+   unsigned int index = h & (table->size - 1);
+   Node* tmp = table->buckets[index];
 
-   1. Check the existence of the file.
-   2. Read the first integer, the size of the table.
-   3. Call ht_create with the size just read.
-   4. Loop that continues until EOF:
-      - Tries to read an integer (size of key), and
-      if it is found, allocates that amount of space
-      and reads the key data next. Repeat the same
-      steps for the value size and data.
-      - Calls ht_insert passing the table, the key
-      buffer and the value buffer. ht_insert
-      allocates memory for the buffer so the function
-      frees the memory for the just allocated buffers.
-   5. Closes the file stream and return a pointer
-      to the just created table.
+   // Check if the key already exists
+   while (tmp != NULL) {
+      if (strcmp(tmp->key, key) == 0) {
+         // It means there already is a node with the
+         // same key. In this case the function frees
+         // the new key ad the previuos value and assignes
+         // the new value to the old node
+         free(key);
+         free(tmp->value);
+         tmp->value = value;
+         // The count remains the same
+         return true;
+      }
 
-   TODO: replace ht_insert function call with a
-   personalized logic that prevents a second and
-   useless allocation of the key and value buffers.
-*/
+      tmp = tmp->next;
+   }
+
+   // If the function gets here it means the key does not exist
+   // In this case it allocates the memory for a new node
+   Node* newNode = malloc(sizeof(Node));
+   if (!newNode) {
+      return false;
+   }
+   newNode->key = key;
+   newNode->value = value;
+   newNode->rawHash = h;
+   newNode->next = table->buckets[index];
+   table->buckets[index] = newNode;
+   table->count++;
+   return true;
+}
+
 HashTable* ht_load(const char* filename) {
    FILE* fp = fopen(filename, "rb");
    if (!fp) {
@@ -360,11 +360,8 @@ HashTable* ht_load(const char* filename) {
       // Get the value from the file
       fread(value, value_size, 1, fp);
 
-      bool done = ht_insert(table, key, value);
-      
-      // Free the temporary buffers because ht_insert makes a copy
-      free(key);
-      free(value);
+      // Call helper function, read comments for details
+      bool done = ht_insert_own(table, key, value);
 
       if (!done) {
          ht_destroy(table);

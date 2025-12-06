@@ -96,4 +96,11 @@ bool ht_save (HashTable* table, const char* filename);
 */
 HashTable* ht_load (const char* filename);
 
+/*
+   Inserts a node taking ownership of the key and value pointers.
+   The caller must not free key or value after calling this, unless
+   the function returns false (insertion failed).
+*/
+bool ht_insert_own(HashTable* table, char* key, char* value);
+
 #endif

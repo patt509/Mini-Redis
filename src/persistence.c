@@ -101,10 +101,8 @@ HashTable* aof_load(const char* filename) {
             char* val = malloc(val_len);
             fread(val, val_len, 1, fp);
 
-            ht_insert(table, key, val);
+            ht_insert_own(table, key, val);
             
-            free(key);
-            free(val);
         } else if (op == OP_DEL) {
             int key_len;
             if (fread(&key_len, sizeof(int), 1, fp) != 1) break;
