@@ -12,12 +12,24 @@ int main() {
    // Ask for persistence
    char persistence_choice;
    bool use_persistence = false;
-   printf("Enable persistence? (y/n): ");
-   if (scanf(" %c", &persistence_choice) == 1 && (persistence_choice == 'y' || persistence_choice == 'Y')) {
-      use_persistence = true;
-   }
-   // Consume newline
-   while (getchar() != '\n');
+   bool valid_choice = false;
+
+   do {
+      printf("Enable persistence? (y/n): ");
+      if (scanf(" %c", &persistence_choice) == 1) {
+         if (persistence_choice == 'y' || persistence_choice == 'Y') {
+            use_persistence = true;
+            valid_choice = true;
+         } else if (persistence_choice == 'n' || persistence_choice == 'N') {
+            use_persistence = false;
+            valid_choice = true;
+         } else {
+            printf("Invalid choice. Please enter 'y' or 'n'.\n");
+         }
+      }
+      // Consume newline and any extra characters
+      while (getchar() != '\n');
+   } while (!valid_choice);
 
    HashTable* table = NULL;
 
