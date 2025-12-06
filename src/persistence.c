@@ -118,3 +118,16 @@ HashTable* aof_load(const char* filename) {
     fclose(fp);
     return table;
 }
+
+bool aof_create_empty(const char* filename, int size) {
+    FILE* fp = fopen(filename, "wb");
+    if (!fp) return false;
+
+    if (fwrite(&size, sizeof(int), 1, fp) != 1) {
+        fclose(fp);
+        return false;
+    }
+
+    fclose(fp);
+    return true;
+}

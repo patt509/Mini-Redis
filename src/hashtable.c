@@ -84,7 +84,7 @@ static uint64_t hash (char* key) {
    return hash;
 }
 
-Node* ht_create_pair (char* key, char* value, uint64_t hash) {
+static Node* ht_create_pair (char* key, char* value, uint64_t hash) {
    // Value or key not valid
    if (!value || !key) {
       return NULL;

@@ -42,6 +42,12 @@ bool aof_log_del(const char* key);
 HashTable* aof_load(const char* filename);
 
 /*
+    Creates a new empty AOF file with the given table size as header.
+    Returns true if successful.
+*/
+bool aof_create_empty(const char* filename, int size);
+
+/*
     Syncs the file buffer to disk (fsync).
     Call this if you want to be 100% sure data is on disk.
 */

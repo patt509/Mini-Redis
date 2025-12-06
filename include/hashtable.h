@@ -29,18 +29,6 @@ typedef struct HashTable {
 HashTable* ht_create (int size);
 
 /*
-   Helper for the insert function.
-
-   Accepts input value and key.
-   Allocates a new node, allocates memory for the value
-   and for the key (deep copy) and saves them in the node
-   fields.
-   Sets the next pointer of the node to NULL and return
-   the pointer to the just created node.
-*/
-Node* ht_create_pair (char* key, char* value, uint64_t hash);
-
-/*
    Function that inserts a node into the table.
 
    Accept a pointer to the table, the key and the value.
