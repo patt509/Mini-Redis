@@ -70,14 +70,14 @@ int main() {
       // If persistence is enabled, we need to initialize the file
       // and write the table size as header (if we decide to support size header)
       if (use_persistence) {
-          // Create the new AOF file with the size header
-          if (aof_create_empty(FILENAME, table->size)) {
-              // Now open in append mode
-              aof_init(FILENAME);
-              printf("Persistence enabled. AOF file initialized.\n");
-          } else {
-              printf("Error creating AOF file.\n");
-          }
+         // Create the new AOF file with the size header
+         if (aof_create_empty(FILENAME, table->size)) {
+            // Now open in append mode
+            aof_init(FILENAME);
+            printf("Persistence enabled. AOF file initialized.\n");
+         } else {
+           printf("Error creating AOF file.\n");
+         }
       }
    }
 
@@ -86,7 +86,7 @@ int main() {
    
    // Cleanup
    if (use_persistence) {
-       aof_close();
+      aof_close();
    }
    ht_destroy(table);
    return 0;
