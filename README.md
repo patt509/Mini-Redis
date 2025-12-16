@@ -52,7 +52,7 @@ gcc -o mini-redis main.c src/server.c src/hashtable.c src/persistence.c -I./incl
    Open a separate terminal window and connect using `netcat` (or `telnet`):
 
    ```bash
-   nc localhost 6379
+   nc localhost 8080
    ```
 
 ## Persistence
