@@ -40,7 +40,7 @@ int main() {
          printf("Database loaded from AOF file.\n");
          // Re-open for appending
          if (!aof_init(FILENAME)) {
-             printf("Warning: Could not open AOF file for writing.\n");
+            printf("Warning: Could not open AOF file for writing.\n");
          }
       } else {
          printf("No existing AOF file found or load failed.\n");
@@ -76,7 +76,7 @@ int main() {
             aof_init(FILENAME);
             printf("Persistence enabled. AOF file initialized.\n");
          } else {
-           printf("Error creating AOF file.\n");
+            printf("Error creating AOF file.\n");
          }
       }
    }

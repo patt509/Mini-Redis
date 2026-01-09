@@ -129,7 +129,7 @@ bool execute_cmd (HashTable* table, char** args, int client_fd) {
          dprintf(client_fd, "%sERR 5%s: the key was not found.\n", RED, RESET);
       }
 
-      return true;      
+      return true;
    } else if (strcmp(args[0], "EXIT") == 0) {
       // If the first arg is "EXIT", close and exit the program
       dprintf(client_fd, "Thanks for using mini-redis!\n");

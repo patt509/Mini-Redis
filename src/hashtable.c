@@ -188,7 +188,7 @@ bool ht_delete (HashTable* table, char* key) {
       table->buckets[index] = tmp->next;
 
       free(tmp->key);
-      free(tmp->value);      
+      free(tmp->value);
       free(tmp);
 
       return true;
